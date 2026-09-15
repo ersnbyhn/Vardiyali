@@ -128,15 +128,13 @@
       position: relative;
     }
 
-    /* Hem Mesai Girilmiş Hem Not Eklenmiş Gün Kutusu Tümüyle Yeşil */
-    .day-cell.has-note,
-    .day-cell.has-mesai {
+    /* Sadece Not Varsa VEYA Mesai Doldurulmuşsa Kutu Komple Yeşil */
+    .day-cell.is-active-green {
       background-color: #c8e6c9 !important;
       border: 1.5px solid #2e7d32 !important;
     }
 
-    .day-cell.has-note .day-number-bar,
-    .day-cell.has-mesai .day-number-bar {
+    .day-cell.is-active-green .day-number-bar {
       background-color: #a5d6a7 !important;
     }
 
@@ -168,6 +166,11 @@
       background: #fff3cd;
       outline: none;
       border-bottom: 1px solid #ffeeba;
+    }
+
+    .day-cell.is-active-green .day-shift-input {
+      background: #d4edda !important;
+      border-bottom: 1px solid #c3e6cb !important;
     }
     
     .day-shift-input::placeholder {
@@ -621,6 +624,19 @@
       window.scrollTo(0, 0);
     };
 
+    function updateCellColor(cell, noteKey, hoursKey) {
+      const hasNote = (localStorage.getItem(noteKey) || "").trim() !== "";
+      const mesaiVal = (localStorage.getItem(hoursKey) || "").trim();
+      const hasMesai = mesaiVal !== "" && parseFloat(mesaiVal) > 0;
+
+      // SADECE NOT VARSA VEYA MESAİ GİRİLMİŞSE YEŞİL YAP
+      if (hasNote || hasMesai) {
+        cell.classList.add("is-active-green");
+      } else {
+        cell.classList.remove("is-active-green");
+      }
+    }
+
     function renderCalendar(monthIndex) {
       daysGrid.innerHTML = "";
       
@@ -644,15 +660,8 @@
         const shiftKey = `vardiya_${year}_${monthIndex}_${day}`;
         const hoursKey = `mesai_${year}_${monthIndex}_${day}`;
 
-        const existingNote = localStorage.getItem(noteKey) || "";
-        if (existingNote.trim() !== "") {
-          cell.classList.add("has-note");
-        }
-
-        const existingHours = (localStorage.getItem(hoursKey) || "").trim();
-        if (existingHours !== "" && parseFloat(existingHours) > 0) {
-          cell.classList.add("has-mesai");
-        }
+        // Başlangıçta rengi kontrol et
+        updateCellColor(cell, noteKey, hoursKey);
 
         const numBar = document.createElement("div");
         numBar.className = "day-number-bar";
@@ -667,7 +676,7 @@
 
         numBar.appendChild(numSpan);
 
-        // Sarı alan (Vardiya + Placeholder)
+        // Vardiya Alanı
         const shiftInput = document.createElement("input");
         shiftInput.type = "text";
         shiftInput.className = "day-shift-input";
@@ -678,13 +687,13 @@
           calculateTotal(monthIndex, daysInMonth);
         };
 
-        // Alt alan (Mesai + Placeholder)
+        // Mesai Alanı
         const input = document.createElement("input");
         input.type = "number";
         input.step = "0.5";
         input.className = "day-input";
         input.placeholder = "mesai";
-        input.value = existingHours;
+        input.value = localStorage.getItem(hoursKey) || "";
         input.oninput = () => {
           const val = input.value.trim();
           if (val) {
@@ -693,12 +702,7 @@
             localStorage.removeItem(hoursKey);
           }
           
-          if (val !== "" && parseFloat(val) > 0) {
-            cell.classList.add("has-mesai");
-          } else {
-            cell.classList.remove("has-mesai");
-          }
-
+          updateCellColor(cell, noteKey, hoursKey);
           calculateTotal(monthIndex, daysInMonth);
         };
 
@@ -746,7 +750,6 @@
       return total;
     }
 
-    /* Gece Zammı Saat Hesabı Otomasyonu */
     function getMonthNightShiftHours(monthIndex) {
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
       let totalNightHours = 0;
@@ -778,7 +781,6 @@
         s2Input.value = standardWorkHours;
       }
 
-      // Gece Zammı Saati Güncelleme (s7)
       const nightShiftHours = getMonthNightShiftHours(monthIndex);
       const s7Input = document.getElementById("s7");
       if (s7Input) {
