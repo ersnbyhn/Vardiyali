@@ -128,16 +128,7 @@
       position: relative;
     }
 
-    /* Sadece Not Varsa VEYA Mesai Doldurulmuşsa Kutu Komple Yeşil */
-    .day-cell.is-active-green {
-      background-color: #c8e6c9 !important;
-      border: 1.5px solid #2e7d32 !important;
-    }
-
-    .day-cell.is-active-green .day-number-bar {
-      background-color: #a5d6a7 !important;
-    }
-
+    /* Gün (Tarih) Barı - Sadece Not Varsa Yeşil Olur */
     .day-number-bar {
       display: flex;
       justify-content: center;
@@ -148,6 +139,10 @@
       user-select: none;
     }
 
+    .day-cell.has-note .day-number-bar {
+      background-color: #a5d6a7 !important;
+    }
+
     .day-number {
       font-size: 12px;
       font-weight: bold;
@@ -155,7 +150,7 @@
       text-align: center;
     }
 
-    /* Sarı vardiya inputu */
+    /* Sarı vardiya inputu (Mesai durumundan bağımsız, hep aynı renk kalır) */
     .day-shift-input {
       width: 100%;
       height: 22px;
@@ -167,11 +162,6 @@
       outline: none;
       border-bottom: 1px solid #ffeeba;
     }
-
-    .day-cell.is-active-green .day-shift-input {
-      background: #d4edda !important;
-      border-bottom: 1px solid #c3e6cb !important;
-    }
     
     .day-shift-input::placeholder {
       color: #a08836;
@@ -179,7 +169,7 @@
       font-weight: normal;
     }
 
-    /* Mesai inputu */
+    /* Mesai inputu - Standart hali şeffaf/beyaz */
     .day-input {
       width: 100%;
       height: 24px;
@@ -189,6 +179,12 @@
       font-weight: bold;
       background: transparent;
       outline: none;
+    }
+
+    /* Mesai Doldurulduğunda Sadece Mesai Kutusu Yeşil Olur */
+    .day-input.has-mesai-val {
+      background-color: #c8e6c9 !important;
+      color: #155724;
     }
 
     .day-input::placeholder {
@@ -624,16 +620,23 @@
       window.scrollTo(0, 0);
     };
 
-    function updateCellColor(cell, noteKey, hoursKey) {
+    function updateDayElementStyles(cell, input, noteKey, hoursKey) {
       const hasNote = (localStorage.getItem(noteKey) || "").trim() !== "";
       const mesaiVal = (localStorage.getItem(hoursKey) || "").trim();
       const hasMesai = mesaiVal !== "" && parseFloat(mesaiVal) > 0;
 
-      // SADECE NOT VARSA VEYA MESAİ GİRİLMİŞSE YEŞİL YAP
-      if (hasNote || hasMesai) {
-        cell.classList.add("is-active-green");
+      // 1. Not varsa üstteki tarih çubuğu yeşil olsun, yoksa normal
+      if (hasNote) {
+        cell.classList.add("has-note");
       } else {
-        cell.classList.remove("is-active-green");
+        cell.classList.remove("has-note");
+      }
+
+      // 2. Mesai yazıldıysa sadece alttaki mesai kutusu yeşil olsun, yoksa şeffaf
+      if (hasMesai) {
+        input.classList.add("has-mesai-val");
+      } else {
+        input.classList.remove("has-mesai-val");
       }
     }
 
@@ -660,9 +663,6 @@
         const shiftKey = `vardiya_${year}_${monthIndex}_${day}`;
         const hoursKey = `mesai_${year}_${monthIndex}_${day}`;
 
-        // Başlangıçta rengi kontrol et
-        updateCellColor(cell, noteKey, hoursKey);
-
         const numBar = document.createElement("div");
         numBar.className = "day-number-bar";
         numBar.title = "Not eklemek için tıklayın";
@@ -676,7 +676,7 @@
 
         numBar.appendChild(numSpan);
 
-        // Vardiya Alanı
+        // Vardiya Alanı (Sarı kalır, mesai durumundan etkilenmez)
         const shiftInput = document.createElement("input");
         shiftInput.type = "text";
         shiftInput.className = "day-shift-input";
@@ -694,6 +694,7 @@
         input.className = "day-input";
         input.placeholder = "mesai";
         input.value = localStorage.getItem(hoursKey) || "";
+        
         input.oninput = () => {
           const val = input.value.trim();
           if (val) {
@@ -702,9 +703,12 @@
             localStorage.removeItem(hoursKey);
           }
           
-          updateCellColor(cell, noteKey, hoursKey);
+          updateDayElementStyles(cell, input, noteKey, hoursKey);
           calculateTotal(monthIndex, daysInMonth);
         };
+
+        // İlk yüklemede renkleri uygula
+        updateDayElementStyles(cell, input, noteKey, hoursKey);
 
         cell.appendChild(numBar);
         cell.appendChild(shiftInput);
