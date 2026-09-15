@@ -128,11 +128,16 @@
       position: relative;
     }
 
-    /* Hem Mesai Girilmiş Hem Not Eklenmiş Gün Yeşil Vurgusu */
+    /* Hem Mesai Girilmiş Hem Not Eklenmiş Gün Kutusu Tümüyle Yeşil */
     .day-cell.has-note,
     .day-cell.has-mesai {
-      background-color: #d4edda !important;
-      border: 1.5px solid #28a745 !important;
+      background-color: #c8e6c9 !important;
+      border: 1.5px solid #2e7d32 !important;
+    }
+
+    .day-cell.has-note .day-number-bar,
+    .day-cell.has-mesai .day-number-bar {
+      background-color: #a5d6a7 !important;
     }
 
     .day-number-bar {
