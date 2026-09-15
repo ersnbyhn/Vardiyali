@@ -128,9 +128,16 @@
       position: relative;
     }
 
+    /* Not eklenmiş gün arka planı */
     .day-cell.has-note {
-      background-color: #d4edda !important;
+      background-color: #e2f0d9 !important;
       border-color: #28a745;
+    }
+
+    /* Mesai saati girilmiş gün yeşil vurgusu */
+    .day-cell.has-mesai {
+      background-color: #d4edda !important;
+      border: 1.5px solid #28a745 !important;
     }
 
     .day-number-bar {
@@ -642,6 +649,11 @@
           cell.classList.add("has-note");
         }
 
+        const existingHours = (localStorage.getItem(hoursKey) || "").trim();
+        if (existingHours !== "" && parseFloat(existingHours) > 0) {
+          cell.classList.add("has-mesai");
+        }
+
         const numBar = document.createElement("div");
         numBar.className = "day-number-bar";
         numBar.title = "Not eklemek için tıklayın";
@@ -672,9 +684,21 @@
         input.step = "0.5";
         input.className = "day-input";
         input.placeholder = "mesai";
-        input.value = localStorage.getItem(hoursKey) || "";
+        input.value = existingHours;
         input.oninput = () => {
-          localStorage.setItem(hoursKey, input.value);
+          const val = input.value.trim();
+          if (val) {
+            localStorage.setItem(hoursKey, val);
+          } else {
+            localStorage.removeItem(hoursKey);
+          }
+          
+          if (val !== "" && parseFloat(val) > 0) {
+            cell.classList.add("has-mesai");
+          } else {
+            cell.classList.remove("has-mesai");
+          }
+
           calculateTotal(monthIndex, daysInMonth);
         };
 
