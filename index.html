@@ -129,7 +129,7 @@
     }
 
     .day-cell.has-note {
-      background-color: #d4edda !important; /* Not yazılınca yeşil renk */
+      background-color: #d4edda !important;
       border-color: #28a745;
     }
 
@@ -150,29 +150,41 @@
       text-align: center;
     }
 
-    /* Sarı vardiya inputu (Metinsiz boş) */
+    /* Sarı vardiya inputu */
     .day-shift-input {
       width: 100%;
       height: 22px;
       border: none;
       text-align: center;
-      font-size: 11px !important;
+      font-size: 10px !important;
       font-weight: bold;
-      background: #fff3cd; /* Sarı renk */
+      background: #fff3cd;
       outline: none;
       border-bottom: 1px solid #ffeeba;
     }
+    
+    .day-shift-input::placeholder {
+      color: #a08836;
+      font-size: 9px;
+      font-weight: normal;
+    }
 
-    /* Mesai inputu (Metinsiz boş) */
+    /* Mesai inputu */
     .day-input {
       width: 100%;
       height: 24px;
       border: none;
       text-align: center;
-      font-size: 13px !important;
+      font-size: 12px !important;
       font-weight: bold;
       background: transparent;
       outline: none;
+    }
+
+    .day-input::placeholder {
+      color: #aaa;
+      font-size: 9px;
+      font-weight: normal;
     }
 
     .total-bar {
@@ -186,7 +198,7 @@
       border-radius: 4px;
     }
 
-    /* --- NOT MODALI (PENCERE) --- */
+    /* --- NOT MODALI --- */
     #noteModal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -240,7 +252,7 @@
     .btn-save-note { background: #28a745; color: white; }
     .btn-close-note { background: #6c757d; color: white; }
 
-    /* --- MAAŞ HESAPLAMA OTOMASYONU FORM STİLLERİ --- */
+    /* --- FORM STİLLERİ --- */
     .section-divider {
       margin-top: 20px;
       margin-bottom: 10px;
@@ -337,7 +349,6 @@
       color: #d35400;
     }
 
-    /* --- LOGO VE ALT BİLGİ ALANI --- */
     .footer {
       display: flex;
       flex-direction: column;
@@ -383,7 +394,6 @@
       margin-left: 5px;
     }
 
-    /* --- ÖZEL BİLDİRİM (TOAST) STİLİ --- */
     #toast-message {
       position: fixed;
       top: -60px;
@@ -410,10 +420,8 @@
 </head>
 <body>
 
-  <!-- ÖZEL BİLDİRİM KUTUSU -->
   <div id="toast-message">İşlem Tamamlandı!</div>
 
-  <!-- NOT PENCERESİ (MODAL) -->
   <div id="noteModal" class="hidden">
     <div class="modal-content">
       <h3 id="modalTitle">Gün Notu</h3>
@@ -425,19 +433,16 @@
     </div>
   </div>
 
-  <!-- 1. SAYFA: 12 AY SEÇİM EKRANI -->
   <div id="monthsView" class="container">
     <h2>2026 MESAİ TAKİBİ</h2>
     <div id="monthsGrid" class="months-grid"></div>
 
-    <!-- LOGO ALANI (ANA SAYFA) -->
     <div class="footer">
       <img src="https://i.ibb.co/mFNgxpdC/icon-192.png" alt="EB Logo" class="footer-logo">
       <div class="footer-text">ErsNByhN</div>
     </div>
   </div>
 
-  <!-- 2. SAYFA: AY DETAYI, TAKVİM VE MAAŞ HESAPLAMA OTOMASYONU -->
   <div id="calendarView" class="container hidden">
     <div class="header-nav">
       <button id="backBtn">← Geri</button>
@@ -445,21 +450,17 @@
       <div style="width: 45px;"></div>
     </div>
 
-    <!-- Gün Başlıkları (Pt - Pz) -->
     <div class="weekdays-grid">
       <div>Pt</div><div>Sa</div><div>Ça</div><div>Pe</div><div>Cu</div><div>Ct</div><div>Pz</div>
     </div>
 
-    <!-- Takvim Günleri -->
     <div id="daysGrid" class="days-grid"></div>
 
-    <!-- Toplam Mesai Barı -->
     <div class="total-bar">
       <span>Toplam Mesai: </span>
       <span id="totalHours">0</span> Saat
     </div>
 
-    <!-- MAAŞ HESAPLAMA OTOMASYONU -->
     <div class="section-divider">MAAŞ HESAPLAMA OTOMASYONU</div>
 
     <form action="javascript:void(0);">
@@ -517,7 +518,6 @@
       <div class="result-row"><span>TOPLAM MAAŞ (Net):</span><span id="resToplam" class="result-val">0,00 TL</span></div>
     </div>
     
-    <!-- LOGO ALANI (DETAY SAYFASI) -->
     <div class="footer">
       <img src="https://i.ibb.co/mFNgxpdC/icon-192.png" alt="EB Logo" class="footer-logo">
       <div class="footer-text">ErsNByhN</div>
@@ -530,7 +530,6 @@
       "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"
     ];
 
-    /* RESMİ MEVZUAT PARAMETRELERİ */
     const Parametretablolari = {
       2026: {
         default: { asgari: "33030,00", dv_muaf: "250,70", gv_muaf: "4211,33" },
@@ -575,7 +574,6 @@
       }
     }
 
-    /* --- TAKVİM İŞLEMLERİ --- */
     function renderMonthsList() {
       monthsGrid.innerHTML = "";
       monthNames.forEach((month, index) => {
@@ -644,7 +642,6 @@
           cell.classList.add("has-note");
         }
 
-        // Üst Bar: Sadece Ortalanmış Gün Numarası (Tıklandığında not açılır)
         const numBar = document.createElement("div");
         numBar.className = "day-number-bar";
         numBar.title = "Not eklemek için tıklayın";
@@ -658,20 +655,23 @@
 
         numBar.appendChild(numSpan);
 
-        // Ortaşısarı alan: Vardiya (Tamamen boş)
+        // Sarı alan (Vardiya + Placeholder)
         const shiftInput = document.createElement("input");
         shiftInput.type = "text";
         shiftInput.className = "day-shift-input";
+        shiftInput.placeholder = "vardiya";
         shiftInput.value = localStorage.getItem(shiftKey) || "";
         shiftInput.oninput = () => {
           localStorage.setItem(shiftKey, shiftInput.value);
+          calculateTotal(monthIndex, daysInMonth);
         };
 
-        // Alt alan: Mesai (Tamamen boş)
+        // Alt alan (Mesai + Placeholder)
         const input = document.createElement("input");
         input.type = "number";
         input.step = "0.5";
         input.className = "day-input";
+        input.placeholder = "mesai";
         input.value = localStorage.getItem(hoursKey) || "";
         input.oninput = () => {
           localStorage.setItem(hoursKey, input.value);
@@ -687,7 +687,6 @@
       calculateTotal(monthIndex, daysInMonth);
     }
 
-    /* --- NOT MODAL İŞLEMLERİ --- */
     function openNoteModal(monthIndex, day, noteKey) {
       activeModalKey = noteKey;
       modalTitle.innerText = `${day} ${monthNames[monthIndex]} 2026 - Gün Notu`;
@@ -723,6 +722,22 @@
       return total;
     }
 
+    /* Gece Zammı Saat Hesabı Otomasyonu */
+    function getMonthNightShiftHours(monthIndex) {
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+      let totalNightHours = 0;
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const val = (localStorage.getItem(`vardiya_${year}_${monthIndex}_${day}`) || "").trim();
+        if (val === "16:00") {
+          totalNightHours += 3.5;
+        } else if (val === "00:08") {
+          totalNightHours += 5.5;
+        }
+      }
+      return totalNightHours;
+    }
+
     function calculateTotal(monthIndex, daysInMonth) {
       const total = getMonthTotalHours(monthIndex);
       totalHours.innerText = total;
@@ -737,8 +752,16 @@
       const s2Input = document.getElementById("s2");
       if (s2Input) {
         s2Input.value = standardWorkHours;
-        OtomatikHesapla();
       }
+
+      // Gece Zammı Saati Güncelleme (s7)
+      const nightShiftHours = getMonthNightShiftHours(monthIndex);
+      const s7Input = document.getElementById("s7");
+      if (s7Input) {
+        s7Input.value = nightShiftHours > 0 ? nightShiftHours : "";
+      }
+
+      OtomatikHesapla();
     }
 
     function G(id) {
