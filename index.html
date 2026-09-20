@@ -825,14 +825,17 @@
       let B3 = G("s2");
       let s3El = document.getElementById("s3");
       let s11El = document.getElementById("s11");
+      let s14El = document.getElementById("s14");
       let gzOranEl = document.getElementById("gz_oran");
       
       let temelBrut = B2 * B3;
       let ikramiye = 75 * B2;
       let geceZammaOrani = B2 * 0.10;
+      let sendikaAidati = B2 * 7.5;
 
       if (s3El) s3El.value = temelBrut.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       if (s11El) s11El.value = ikramiye.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (s14El) s14El.value = B2 > 0 ? sendikaAidati.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "";
       if (gzOranEl) gzOranEl.value = geceZammaOrani.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
